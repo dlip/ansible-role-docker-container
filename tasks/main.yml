@@ -1,0 +1,20 @@
+
+- name: Copy docker container check script
+  copy: src=container_old.sh dest=/usr/bin/container_old.sh mode=0755
+
+- name: Check and remove old containers
+  command: /usr/bin/container_old.sh '{{item.container.name}}' '{{item.container.image}}'
+  with_items: run_docker_containers
+  register: container_old
+  changed_when: "'CONTAINER OLD' in container_old.stdout"
+
+- name: Start docker containers
+  docker:
+  args: "{{item.container}}"
+  with_items: run_docker_containers
+
+- name: Add docker nginx proxy sites
+  template: src=nginx-proxy.j2 dest=/etc/nginx/sites-enabled/{{item.container.name}}
+  when: item.site is defined
+  notify: reload nginx
+  with_items: run_docker_containers

@@ -1,0 +1,41 @@
+{% if item.site.name is defined %}
+{% if item.site.ssl is defined %}
+server {
+  listen      80;
+  server_name {{item.site.name}};
+  rewrite (.*) https://$http_host$1 permanent;
+}
+{% endif %}
+server {
+  {% if item.site.ssl is defined %}
+  listen 443 ssl;
+  ssl_certificate {{nginx_ssl_certificate}};
+  ssl_certificate_key {{nginx_ssl_certificate_key}};
+  {% else %}
+  listen 80;
+  {% endif %}
+
+  server_name {{item.site.name}};
+  {% if item.site.password is defined %}
+  proxy_set_header Authorization "";
+  {% endif %}
+
+  location / {
+    proxy_pass              http://localhost:{{item.site.port}};
+    proxy_set_header        Host $host;
+    proxy_set_header        X-Real-IP $remote_addr;
+    proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header        X-Forwarded-Proto $scheme;
+    proxy_connect_timeout   150;
+    proxy_send_timeout      100;
+    proxy_read_timeout      100;
+    proxy_buffers           4 32k;
+    client_max_body_size    8m;
+    client_body_buffer_size 128k;
+    {% if item.site.password is defined %}
+    auth_basic "Restricted";
+    auth_basic_user_file {{item.site.password}};
+    {% endif %}
+  }
+}
+{% endif %}
