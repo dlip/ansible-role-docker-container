@@ -34,7 +34,7 @@ docker pull $image:$version
 docker inspect $name >/dev/null 2>&1
 if [ "$?" == "0" ]; then
   debug "container exists!"
-  imageid=$(docker images | grep "$image" | grep "\s$version" | awk '{ print $3 }')
+  imageid=$(docker images | grep "^$image\s" | grep "\s$version\s" | awk '{ print $3 }')
   debug $imageid
   if [[ -n $imageid ]]; then
     debug "we have an image"
