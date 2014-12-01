@@ -1,4 +1,11 @@
 {% if item.site.name is defined %}
+{% if item.site.wwwredirect is defined %}
+server {
+  listen      80;
+  server_name www.{{item.site.name}};
+  rewrite (.*) http://{{item.site.name}};
+}
+{% endif %}
 {% if item.site.ssl is defined %}
 server {
   listen      80;
