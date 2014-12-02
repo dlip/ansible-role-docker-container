@@ -1,15 +1,16 @@
-{% if item.site.name is defined %}
-{% if item.site.wwwredirect is defined %}
-server {
-  listen      80;
-  server_name www.{{item.site.name}};
-  rewrite (.*) http://{{item.site.name}};
-}
-{% endif %}
+{% if item.site is defined %}
 {% if item.site.ssl is defined %}
 server {
   listen      80;
+
+  {% if item.site.names is defined %}
+  {% for name in item.site.names %}
+  server_name {{name}};
+  {% endfor %}
+  {% else %}
   server_name {{item.site.name}};
+  {% endif %}
+
   rewrite (.*) https://$http_host$1 permanent;
 }
 {% endif %}
@@ -22,7 +23,14 @@ server {
   listen 80;
   {% endif %}
 
+  {% if item.site.names is defined %}
+  {% for name in item.site.names %}
+  server_name {{name}};
+  {% endfor %}
+  {% else %}
   server_name {{item.site.name}};
+  {% endif %}
+
   {% if item.site.password is defined %}
   proxy_set_header Authorization "";
   {% endif %}
