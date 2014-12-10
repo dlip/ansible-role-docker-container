@@ -2,5 +2,5 @@
 # defaults file for docker-container
 nginx_ssl_certificate: '/etc/nginx/ssl.pem'
 nginx_ssl_certificate_key: '/etc/nginx/ssl.key'
-docker_stop_all: false
-docker_stop_all_non_storage: false
+docker_restart_all: false
+docker_restart_all_non_storage: false
