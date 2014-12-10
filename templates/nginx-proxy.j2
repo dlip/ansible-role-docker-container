@@ -31,7 +31,7 @@ server {
   server_name {{item.item.site.name}};
   {% endif %}
 
-  {% if item.item.site.password is defined %}
+  {% if item.item.site.password is defined and item.item.site.password != '' %}
   proxy_set_header Authorization "";
   {% endif %}
 
@@ -47,7 +47,7 @@ server {
     proxy_buffers           4 32k;
     client_max_body_size    8m;
     client_body_buffer_size 128k;
-    {% if item.item.site.password is defined %}
+    {% if item.item.site.password is defined and item.item.site.password != '' %}
     auth_basic "Restricted";
     auth_basic_user_file {{item.item.site.password}};
     {% endif %}
