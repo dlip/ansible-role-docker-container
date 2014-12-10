@@ -1,21 +1,21 @@
-{% if item.site is defined %}
-{% if item.site.ssl is defined %}
+{% if item.item.site is defined %}
+{% if item.item.site.ssl is defined %}
 server {
   listen      80;
 
-  {% if item.site.names is defined %}
-  {% for name in item.site.names %}
+  {% if item.item.site.names is defined %}
+  {% for name in item.item.site.names %}
   server_name {{name}};
   {% endfor %}
   {% else %}
-  server_name {{item.site.name}};
+  server_name {{item.item.site.name}};
   {% endif %}
 
   rewrite (.*) https://$http_host$1 permanent;
 }
 {% endif %}
 server {
-  {% if item.site.ssl is defined %}
+  {% if item.item.site.ssl is defined %}
   listen 443 ssl;
   ssl_certificate {{nginx_ssl_certificate}};
   ssl_certificate_key {{nginx_ssl_certificate_key}};
@@ -23,20 +23,20 @@ server {
   listen 80;
   {% endif %}
 
-  {% if item.site.names is defined %}
-  {% for name in item.site.names %}
+  {% if item.item.site.names is defined %}
+  {% for name in item.item.site.names %}
   server_name {{name}};
   {% endfor %}
   {% else %}
-  server_name {{item.site.name}};
+  server_name {{item.item.site.name}};
   {% endif %}
 
-  {% if item.site.password is defined %}
+  {% if item.item.site.password is defined %}
   proxy_set_header Authorization "";
   {% endif %}
 
   location / {
-    proxy_pass              http://localhost:{{item.site.port}};
+    proxy_pass              http://{{item.stdout}}:{{item.item.site.port | default('80')}};
     proxy_set_header        Host $host;
     proxy_set_header        X-Real-IP $remote_addr;
     proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -47,9 +47,9 @@ server {
     proxy_buffers           4 32k;
     client_max_body_size    8m;
     client_body_buffer_size 128k;
-    {% if item.site.password is defined %}
+    {% if item.item.site.password is defined %}
     auth_basic "Restricted";
-    auth_basic_user_file {{item.site.password}};
+    auth_basic_user_file {{item.item.site.password}};
     {% endif %}
   }
 }

@@ -2,6 +2,9 @@
 - name: Copy docker container check script
   copy: src=container_old.sh dest=/usr/bin/container_old.sh mode=0755
 
+- name: Copy docker container ip script
+  copy: src=container_ip.sh dest=/usr/bin/container_ip.sh mode=0755
+
 - name: Stop all docker containers
   docker: image="{{item.container.image}}" name="{{item.container.name}}" state=absent
   with_items: run_docker_containers
@@ -24,8 +27,14 @@
   args: "{{item.container}}"
   with_items: run_docker_containers
 
-- name: Add docker nginx proxy sites
-  template: src=nginx-proxy.j2 dest=/etc/nginx/sites-enabled/{{item.container.name}}
+- name: Get docker container ips
+  command: container_ip.sh "{{item.container.name}}"
+  register: docker_ips
   when: item.site is defined
-  notify: reload nginx
   with_items: run_docker_containers
+
+- name: Add docker nginx proxy sites
+  template: src=nginx-proxy.j2 dest=/etc/nginx/sites-enabled/{{item.item.container.name}}
+  when: item.item.site is defined
+  notify: reload nginx
+  with_items: docker_ips.results
