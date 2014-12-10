@@ -6,11 +6,21 @@
   copy: src=container_ip.sh dest=/usr/bin/container_ip.sh mode=0755
 
 - name: Stop all docker containers
+  docker: image="{{item.container.image}}" name="{{item.container.name}}" state=stopped
+  with_items: run_docker_containers
+  when: docker_restart_all
+
+- name: Remove all docker containers
   docker: image="{{item.container.image}}" name="{{item.container.name}}" state=absent
   with_items: run_docker_containers
   when: docker_restart_all
 
 - name: Stop all non-storage docker containers
+  docker: image="{{item.container.image}}" name="{{item.container.name}}" state=stopped
+  when: docker_restart_all_non_storage and item.storage is not defined
+  with_items: run_docker_containers
+
+- name: Remove all non-storage docker containers
   docker: image="{{item.container.image}}" name="{{item.container.name}}" state=absent
   when: docker_restart_all_non_storage and item.storage is not defined
   with_items: run_docker_containers
