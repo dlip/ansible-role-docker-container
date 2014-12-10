@@ -2,6 +2,16 @@
 - name: Copy docker container check script
   copy: src=container_old.sh dest=/usr/bin/container_old.sh mode=0755
 
+- name: Stop all docker containers
+  docker: image="{{item.container.image}}" name="{{item.container.name}}" state=absent
+  with_items: run_docker_containers
+  when: docker_stop_all
+
+- name: Stop all non-storage docker containers
+  docker: image="{{item.container.image}}" name="{{item.container.name}}" state=absent
+  when: docker_stop_all_non_storage and item.storage is not defined
+  with_items: run_docker_containers
+
 - name: Check and remove old containers
   command: /usr/bin/container_old.sh '{{item.container.name}}' '{{item.container.image}}'
   with_items: run_docker_containers
