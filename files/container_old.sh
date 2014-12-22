@@ -55,5 +55,5 @@ fi
 
 echo "CONTAINER OLD"
 docker stop $name
-sleep 30
-docker rm -f $name
+docker wait $name
+docker rm $name
