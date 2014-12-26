@@ -19,6 +19,8 @@ server {
   listen 443 ssl;
   ssl_certificate {{nginx_ssl_certificate}};
   ssl_certificate_key {{nginx_ssl_certificate_key}};
+  {% elif item.item.site.ssl_passthrough is defined %}
+  listen 443;
   {% else %}
   listen 80;
   {% endif %}
@@ -36,7 +38,7 @@ server {
   {% endif %}
 
   location / {
-    proxy_pass              http://{{item.stdout}}:{{item.item.site.port | default('80')}};
+    proxy_pass              http{% if item.item.site.ssl_passthrough is defined %}s{% endif %}://{{item.stdout}}:{{item.item.site.port | default('80')}};
     proxy_set_header        Host $host;
     proxy_set_header        X-Real-IP $remote_addr;
     proxy_set_header        X-Forwarded-For $proxy_add_x_forwarded_for;
