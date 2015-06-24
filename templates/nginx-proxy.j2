@@ -20,9 +20,9 @@ server {
   ssl_certificate {{nginx_ssl_certificate}};
   ssl_certificate_key {{nginx_ssl_certificate_key}};
   {% elif item.item.site.ssl_passthrough is defined %}
-  listen 443;
+  listen {{item.item.site.ssl_listen_port | default('443')}};
   {% else %}
-  listen 80;
+  listen {{item.item.site.http_listen_port | default('80')}};
   {% endif %}
 
   {% if item.item.site.names is defined %}
