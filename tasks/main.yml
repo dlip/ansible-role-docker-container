@@ -1,3 +1,5 @@
+- name: Copy logstash format nginx config
+  copy: src=logstash_format.conf dest='/etc/nginx/conf.d/' mode=0755
 
 - name: Copy docker container check script
   copy: src=container_old.sh dest=/usr/bin/container_old.sh mode=0755
