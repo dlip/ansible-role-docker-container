@@ -25,7 +25,6 @@ if [ -x $version ]; then
 fi
 
 function debug () {
-  return
   echo $1
 }
 
@@ -41,6 +40,10 @@ if [ "$?" == "0" ]; then
     cimageid=$(docker inspect --format "{{ .Image }}" $name)
     debug $cimageid
     if [[ -n $cimageid ]]; then
+      if [ "$cimageid" == "<no value>" ]; then
+        debug "inspect passed but there is no image?"
+        exit 0
+      fi
       debug "we have a container image"
       uptodate=$(echo $cimageid | grep $imageid)
       if [[ -n $uptodate ]]; then
