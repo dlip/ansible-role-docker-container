@@ -27,12 +27,14 @@ server {
 
   {% if item.item.site.names is defined %}
   access_log /var/log/nginx/{{item.item.site.names[0]}}.access.log logstash;
+  error_log /var/log/nginx/{{item.item.site.names[0]}}.error.log;
   {% for name in item.item.site.names %}
   server_name {{name}};
   {% endfor %}
   {% else %}
   server_name {{item.item.site.name}};
   access_log /var/log/nginx/{{item.item.site.name}}.access.log logstash;
+  error_log /var/log/nginx/{{item.item.site.name}}.error.log;
   {% endif %}
 
   {% if item.item.site.password is defined and item.item.site.password != '' %}
